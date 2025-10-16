@@ -1,0 +1,270 @@
+<?php include('header.php')?>  
+
+<section class="gal-hero text-white" aria-label="Gallery hero">  
+  <div class="bg">  
+    <img src="assets/images/bg/page-bg-1.jpg" alt="DA Tree Service — Gallery background">  
+    <i class="veil"></i>  
+  </div>  
+  <div class="inner">  
+    <nav class="crumbs" aria-label="Breadcrumb">  
+      <a href="index.php">Home</a>  
+      <span>/</span>  
+      <span aria-current="page">Our Latest Projects</span>  
+    </nav>  
+    <h1 class="title">Our Latest Projects</h1>  
+    <p class="lead">Real work. Real results. From removals to clean finishes.</p>  
+  </div>  
+</section>  
+
+<section class="gal-section section-pad" aria-labelledby="gal-title">  
+  <div class="container-wide">  
+    <header class="head">  
+      <h2 id="gal-title">See Our Work</h2>  
+      <div class="tabs" role="tablist" aria-label="Gallery tabs">  
+        <button class="tab is-active" data-target="#tabImages">Images</button>  
+        <button class="tab" data-target="#tabVideos">Videos</button>  
+      </div>  
+    </header>  
+
+    <!-- ===== IMAGES ===== -->  
+    <div id="tabImages" class="tab-pane is-active">  
+      <div class="gal-grid" id="galGrid">  
+        <?php  
+        function gal_img($i, $label){  
+          $thumb = "assets/images/gallery/$i.jpg";  
+          $full = "assets/images/gallery/$i.jpg";  
+        ?>  
+        <figure class="gal-item" data-kind="img" data-full="<?= htmlspecialchars($full) ?>">  
+          <img src="<?= htmlspecialchars($thumb) ?>" alt="<?= htmlspecialchars($label) ?>">  
+          <figcaption>  
+            <span class="badge">Photo</span>  
+            <span class="label"><?= htmlspecialchars($label) ?></span>  
+          </figcaption>  
+        </figure>  
+        <?php } for ($i=1; $i<=222; $i++) gal_img($i, "Project #$i"); ?>  
+      </div>  
+    </div>  
+
+    <!-- ===== VIDEOS ===== -->  
+    <div id="tabVideos" class="tab-pane" hidden>  
+      <?php  
+      $videos = glob('assets/videos/*.mp4');  
+      natcasesort($videos);  
+      if (count($videos) === 0):  
+      ?>  
+        <div style="text-align:center;padding:24px;color:#64748b;">  
+          <p><strong>No videos available yet.</strong></p>  
+          <p>Please check back soon.</p>  
+        </div>  
+      <?php else: ?>  
+        <div class="gal-grid" id="vidGrid">  
+        <?php $i = 0; foreach ($videos as $v): $i++; $label = "Video #$i"; ?>  
+          <figure class="gal-item video" data-video="<?= htmlspecialchars($v) ?>">  
+            <video class="vid-thumb" src="<?= htmlspecialchars($v) ?>" preload="metadata" muted playsinline loop></video>  
+            <i class="play-icon fas fa-play" aria-hidden="true"></i>  
+            <figcaption>  
+              <span class="badge">Video</span>  
+              <span class="label"><?= htmlspecialchars($label) ?></span>  
+            </figcaption>  
+          </figure>  
+        <?php endforeach; ?>  
+        </div>  
+      <?php endif; ?>  
+    </div>  
+
+  </div>  
+</section>  
+
+<!-- ===== LIGHTBOX ===== -->  
+<div class="lightbox" id="mediaLightbox" hidden>  
+  <div class="lightbox-backdrop"></div>  
+  <div class="lightbox-content">  
+    <button class="lb-close" id="lbClose" aria-label="Close"><i class="fas fa-times"></i></button>  
+    <!-- Aquí se inyecta imagen o video dinámicamente -->  
+  </div>  
+</div>  
+
+<style>
+/* — estilo general de grid etc como antes — */
+.container-wide { width: min(1300px, 94vw); margin-inline: auto; }
+.section-pad { padding: 64px 0; }
+.gal-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(250px,1fr)); }
+.gal-item { position: relative; overflow: hidden; border-radius: 16px; background: #f3faf5; border: 1px solid #e3efe8; cursor: pointer; }
+.gal-item img, .vid-thumb { width: 100%; object-fit: cover; display: block; aspect-ratio: 16/9; }
+.play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; color: #fff; width: 60px; height: 60px; border-radius: 50%; background: rgba(26,127,55,0.9); display: grid; place-items: center; border: 3px solid #fff; transition: transform .3s ease, opacity .3s ease; }
+.gal-item:hover .play-icon { transform: translate(-50%, -50%) scale(1.1); }
+.lightbox { position: fixed; inset: 0; display: grid; place-items: center; z-index: 10000; }
+.lightbox-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.8); }
+.lightbox-content { position: relative; z-index: 10; max-width: 90vw; max-height: 90vh; overflow: hidden; }
+.lightbox-content img, .lightbox-content video { width: 100%; height: auto; max-height: 100%; display: block; }
+.lb-close { position: absolute; top: 10px; right: 10px; z-index: 20; background: rgba(0,0,0,0.5); color: #fff; border: none; padding: 8px 10px; font-size: 18px; border-radius: 4px; cursor: pointer; }
+</style>
+
+<script>
+// Tabs toggle
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    document.querySelectorAll('.tab-pane').forEach(p => p.hidden = true);
+    const target = btn.getAttribute('data-target');
+    const pane = document.querySelector(target);
+    if (pane) pane.hidden = false;
+  });
+});
+
+// Lightbox logic
+(function(){
+  const lb = document.getElementById('mediaLightbox');
+  const lbContent = lb.querySelector('.lightbox-content');
+  const lbClose = document.getElementById('lbClose');
+
+  // Función para cerrar
+  function closeLB(){
+    // Pausar video si hay uno
+    const vid = lbContent.querySelector('video');
+    if(vid){
+      vid.pause();
+      vid.removeAttribute('src');
+      vid.load();
+    }
+    // Eliminar contenido dinámico
+    lbContent.querySelectorAll('img, video').forEach(el => el.remove());
+    lb.hidden = true;
+  }
+
+  // Click sobre figura de imagen
+  document.getElementById('galGrid').addEventListener('click', e=>{
+    const fig = e.target.closest('.gal-item[data-full]');
+    if (!fig) return;
+    const full = fig.getAttribute('data-full');
+    if (!full) return;
+
+    // Crear imagen
+    const img = document.createElement('img');
+    img.src = full;
+    img.alt = '';
+    lbContent.appendChild(img);
+
+    lb.hidden = false;
+  });
+
+  // Click sobre figura de video
+  document.getElementById('vidGrid').addEventListener('click', async e=>{
+    const fig = e.target.closest('.gal-item.video');
+    if (!fig) return;
+    const src = fig.getAttribute('data-video');
+    if (!src) return;
+
+    // Ocultar ícono play
+    const icon = fig.querySelector('.play-icon');
+    if(icon) icon.style.display = 'none';
+
+    // Crear video
+    const vid = document.createElement('video');
+    vid.src = src;
+    vid.controls = true;
+    vid.playsInline = true;
+    vid.autoplay = true;
+    vid.muted = false;
+    vid.currentTime = 0;
+
+    // Asegurar que pueda reproducir
+    vid.addEventListener('loadedmetadata', ()=>{
+      // restringir tamaño si es muy grande
+      if(vid.videoHeight > vid.videoWidth){
+        vid.style.maxHeight = '90vh';
+      } else {
+        vid.style.maxWidth = '90vw';
+      }
+    });
+
+    lbContent.appendChild(vid);
+    lb.hidden = false;
+
+    try { await vid.play(); }
+    catch(err){ console.warn('Play falló:', err); }
+  });
+
+  // Cerrar lightbox al botón
+  lbClose.addEventListener('click', closeLB);
+  // Cerrar al hacer clic fuera del contenido
+  lb.addEventListener('click', e => {
+    if (e.target === lb || e.target === lb.querySelector('.lightbox-backdrop')){
+      closeLB();
+    }
+  });
+  // Cerrar con Escape
+  document.addEventListener('keydown', e=>{
+    if(e.key === 'Escape' && !lb.hidden){
+      closeLB();
+    }
+  });
+})();
+</script>
+
+<?php include('footer.php')?>  
+
+<style>
+.container-wide{ width:min(1300px,94vw); margin-inline:auto; }
+.section-pad{ padding:64px 0; }
+.gal-hero{ position:relative; display:grid; place-items:center; min-height:42vh; }
+.gal-hero .bg{ position:absolute; inset:0; overflow:hidden; }
+.gal-hero .bg img{ width:100%; height:100%; object-fit:cover; filter:brightness(.72) contrast(1.05); }
+.gal-hero .bg .veil{ position:absolute; inset:0; background: radial-gradient(900px 420px at 15% 10%, rgba(26,127,55,.28), transparent 55%), linear-gradient(180deg, rgba(0,0,0,.25) 0%, rgba(0,0,0,.68) 60%, rgba(0,0,0,.86) 100%); }
+.gal-hero .inner{ position:relative; z-index:1; text-align:center; color:#fff; padding:56px 20px; }
+.gal-hero .crumbs{ display:flex; gap:8px; justify-content:center; font-weight:700; opacity:.92; }
+.gal-hero .crumbs a{ color:#d1fae5; text-decoration:none; }
+.gal-hero .title{ margin:.5rem 0; font-size: clamp(32px, 6vw, 56px); line-height:1.05; font-weight:900; }
+.gal-hero .lead{ margin:0 auto; max-width:820px; font-weight:600; color:#e6f4ee; }
+.gal-section .head{ display:flex; flex-wrap:wrap; align-items:end; gap:12px; justify-content:space-between; margin-bottom:16px; }
+.gal-section h2{ margin:0; font-size: clamp(22px, 3.2vw, 30px); font-weight:900; color:#0f172a; }
+.tabs{ display:flex; gap:8px; }
+.tab{ appearance:none; border:1.5px solid #1a7f37; background:#fff; color:#1a7f37; font-weight:900; padding:8px 14px; border-radius:999px; cursor:pointer; transition:.15s; }
+.tab:hover{ filter:brightness(.96); }
+.tab.is-active{ background:#1a7f37; color:#fff; }
+.tab-pane{ display:block; }
+.tab-pane[hidden]{ display:none !important; }
+.tab-pane.is-active{ display:block; }
+.gal-grid{ display:grid; gap:14px; grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 1199.98px){ .gal-grid{ grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 767.98px){ .gal-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 479.98px){ .gal-grid{ grid-template-columns: 1fr; } }
+.gal-item{ position:relative; border-radius:16px; overflow:hidden; background:#f3faf5; border:1px solid #e3efe8; box-shadow: 0 10px 24px rgba(0,0,0,.06); }
+.gal-item img{ width:100%; height:100%; object-fit:cover; display:block; aspect-ratio: 4/3; transform:scale(1.02); transition:transform .35s ease; }
+.gal-item .vid-thumb{ width:100%; height:100%; display:block; aspect-ratio:16/9; object-fit:cover; background:#0f172a; }
+.gal-item a, .gal-item .video-btn{ display:block; position:relative; width:100%; padding:0; border:0; background:none; cursor:pointer; }
+.gal-item figcaption{ position:absolute; inset:auto 0 0 0; padding:10px 12px; display:flex; align-items:center; gap:8px; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,.62) 40%, rgba(0,0,0,.80) 100%); color:#fff; transform:translateY(8px); opacity:.0; transition:.25s; }
+.gal-item .badge{ display:inline-flex; align-items:center; height:28px; padding:0 10px; border-radius:999px; background:#1a7f37; font-size:.78rem; font-weight:900; }
+.gal-item .label{ font-weight:800; letter-spacing:.2px; }
+.gal-item .icon{ margin-left:auto; font-size:18px; opacity:.9; }
+.gal-item .play-icon{ position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; color: #fff; width: 60px; height: 60px; border-radius: 50%; background: rgba(26, 127, 55, 0.9); display: grid; place-items: center; border: 3px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,.3); transition: transform .3s ease, opacity .3s ease; pointer-events: none; }
+.gal-item:hover .play-icon{ transform: translate(-50%, -50%) scale(1.1); }
+.gal-item .play-icon.fa-play{ padding-left: 4px; }
+.gal-item:hover img{ transform:scale(1.08); }
+.gal-item:hover figcaption{ transform:translateY(0); opacity:1; }
+.load-more-wrap{ display:flex; justify-content:center; margin-top:14px; }
+.btn-load{ appearance:none; border:2px solid #0f172a; color:#0f172a; background:#fff; font-weight:900; padding:10px 16px; border-radius:12px; cursor:pointer; }
+.btn-load:hover{ background:#0f172a; color:#fff; }
+.why-strip{ background:#0f3320; }
+.why-strip .why-grid{ color:#e7f5ee; display:grid; grid-template-columns:repeat(5,1fr); gap:10px; padding:18px 0; }
+@media (max-width:1199.98px){ .why-strip .why-grid{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:575.98px){ .why-strip .why-grid{ grid-template-columns:repeat(2,1fr); } }
+.why-strip li{ display:flex; gap:10px; align-items:center; justify-content:center; padding:8px 10px; font-weight:800; }
+.why-strip i{ color:#22c55e; }
+.cta-final{ position:relative; background:url('assets/images/bg/page-bg-1.jpg') center/cover no-repeat; }
+.cta-final .veil{ position:absolute; inset:0; background:rgba(0,0,0,.5); }
+.cta-final .inner{ position:relative; z-index:1; padding:42px 0; text-align:center; color:#fff; }
+.cta-final h3{ margin:0 0 6px; font-size: clamp(22px, 3.4vw, 34px); font-weight:900; }
+.cta-final p{ margin:0 0 12px; font-weight:600; opacity:.95; }
+.cta-final .actions{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.btn-solid{ background:#1a7f37; color:#fff; border:0; padding:12px 18px; border-radius:12px; font-weight:900; text-decoration:none; }
+.btn-solid:hover{ filter:brightness(.95); }
+.btn-ghost{ background:transparent; color:#fff; border:2px solid #fff; padding:12px 18px; border-radius:12px; font-weight:900; text-decoration:none; }
+.btn-ghost:hover{ background:#fff; color:#0f172a; }
+.vid-lightbox[hidden]{ display:none; }
+.vid-lightbox{ position:fixed; inset:0; background:rgba(0,0,0,.9); z-index:10000; display:grid; place-items:center; padding:20px; }
+#vidPlayer{ width:min(1200px, 92vw); height:auto; max-height:90vh; background:#000; border-radius:12px; }
+.vid-lightbox .close{ position:absolute; top:18px; right:18px; width:44px; height:44px; border-radius:50%; display:grid; place-items:center; border:1px solid rgba(255,255,255,.5); background:rgba(0,0,0,.4); color:#fff; cursor:pointer; }
+.vid-lightbox .close:hover{ background:rgba(0,0,0,.7); }
+</style>
