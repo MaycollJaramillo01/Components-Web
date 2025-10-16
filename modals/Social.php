@@ -1,9 +1,9 @@
 <!-- Botones flotantes -->
 <div class="floating-buttons">
-    <a href="https://api.whatsapp.com/send?phone=18178616700" class="float-btn whatsapp" target="_blank" rel="noopener" aria-label="WhatsApp">
+    <a href="https://wa.link/7b5ajh" class="float-btn whatsapp" target="_blank" rel="noopener" aria-label="WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
-    <a href="https://m.me/accenttires817" class="float-btn messenger" target="_blank" rel="noopener" aria-label="Messenger">
+    <a href="https://m.me/Huipache.live" class="float-btn messenger" target="_blank" rel="noopener" aria-label="Messenger">
         <i class="fab fa-facebook-messenger"></i>
     </a>
 </div>
