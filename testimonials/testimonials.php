@@ -312,7 +312,9 @@ function stars($n)
             <div class="actions">
               <button type="submit" class="btn-primary">Send Review</button>
               <?php if (!empty($google)) : ?>
-                <a class="btn-outline" href="<?= $google ?>" target="_blank" rel="noopener">Review on Google</a>
+               <a class="btn-primary" href="<?= $google ?>" target="_blank" rel="noopener">
+    Leave a Google Review <i class="fab fa-google ms-2"></i>
+</a>
               <?php endif; ?>
             </div>
           </form>
